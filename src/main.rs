@@ -148,10 +148,8 @@ impl ZellijPlugin for State {
                 should_render = true;
             }
             Event::Key(Key::Char('\n')) => {
-                let layout = self
-                    .layouts
-                    .iter()
-                    .find(|layout| layout.name() == self.selected.as_ref().unwrap());
+                let selected = self.selected.clone().unwrap();
+                let layout = self.layouts.iter().find(|layout| layout.name() == selected);
 
                 if let Some(tlayout) = layout {
                     close_focus();

@@ -1,12 +1,15 @@
 [package]
-name = "room"
-version = "1.0.0"
+name = "z-layouts"
+version = "1.0.1"
 edition = "2021"
-authors = ["Lucas Rosa <x@rvcas.dev>"]
+authors = [
+    "Craig O'Connor <craiggles@opens2.com>",
+    "Lucas Rosa <x@rvcas.dev>"
+]
 publish = false
 
 [dependencies]
 ansi_term = "0.12.1"
 chrono = "0.4.26"
-owo-colors = "3.5.0"
-zellij-tile = "0.38.0"
+owo-colors = "4.0.0"
+zellij-tile = "0.40.0"

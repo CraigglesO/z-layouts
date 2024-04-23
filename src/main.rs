@@ -2,98 +2,101 @@ use owo_colors::OwoColorize;
 use std::collections::BTreeMap;
 use zellij_tile::prelude::*;
 
+#[derive(Default)]
 struct State {
-    tabs: Vec<TabInfo>,
+    layouts: Vec<LayoutInfo>,
     filter: String,
-    selected: Option<usize>,
+    // The file name of the layout that is currently selected
+    selected: Option<String>,
     ignore_case: bool,
 }
-
-impl Default for State {
-    fn default() -> Self {
-        Self {
-            tabs: Vec::default(),
-            filter: String::default(),
-            selected: Some(0),
-            ignore_case: false,
-        }
-    }
-}
+// impl Default for State {
+//     fn default() -> Self {
+//         Self {
+//             layouts: Vec::default(),
+//             filter: String::default(),
+//             selected: None,
+//             ignore_case: false,
+//         }
+//     }
+// }
 
 impl State {
-    fn filter(&self, tab: &&TabInfo) -> bool {
+    fn filter(&self, layout: &&LayoutInfo) -> bool {
         if self.ignore_case {
-            tab.name.to_lowercase() == self.filter.to_lowercase()
-                || tab
-                    .name
+            layout.name().to_lowercase() == self.filter.to_lowercase()
+                || layout
+                    .name()
                     .to_lowercase()
                     .contains(&self.filter.to_lowercase())
         } else {
-            tab.name == self.filter || tab.name.contains(&self.filter)
+            layout.name() == self.filter || layout.name().contains(&self.filter)
         }
     }
 
-    fn viewable_tabs_iter(&self) -> impl Iterator<Item = &TabInfo> {
-        self.tabs.iter().filter(|tab| self.filter(tab))
+    fn viewable_layouts_iter(&self) -> impl Iterator<Item = &LayoutInfo> {
+        self.layouts.iter().filter(|layout| self.filter(layout))
     }
 
-    fn viewable_tabs(&self) -> Vec<&TabInfo> {
-        self.viewable_tabs_iter().collect()
+    fn viewable_layouts(&self) -> Vec<&LayoutInfo> {
+        self.viewable_layouts_iter().collect()
     }
 
     fn reset_selection(&mut self) {
-        let tabs = self.viewable_tabs();
+        let layouts = self.viewable_layouts();
 
-        if tabs.is_empty() {
+        if layouts.is_empty() {
             self.selected = None
-        } else if let Some(tab) = tabs.first() {
-            self.selected = Some(tab.position)
+        } else if let Some(layout) = layouts.first() {
+            self.selected = Some(layout.name().to_string())
         }
     }
 
     fn select_down(&mut self) {
-        let tabs = self.tabs.iter().filter(|tab| self.filter(tab));
+        let layouts = self.layouts.iter().filter(|tab| self.filter(tab));
 
         let mut can_select = false;
         let mut first = None;
-        for TabInfo { position, .. } in tabs {
+        for layout in layouts {
+            let name = layout.name().to_string();
             if first.is_none() {
-                first.replace(position);
+                first.replace(name.clone());
             }
 
             if can_select {
-                self.selected = Some(*position);
+                self.selected = Some(name);
                 return;
-            } else if Some(*position) == self.selected {
+            } else if Some(name) == self.selected {
                 can_select = true;
             }
         }
 
-        if let Some(position) = first {
-            self.selected = Some(*position)
+        if let Some(name) = first {
+            self.selected = Some(name)
         }
     }
 
     fn select_up(&mut self) {
-        let tabs = self.tabs.iter().filter(|tab| self.filter(tab)).rev();
+        let layouts = self.layouts.iter().filter(|tab| self.filter(tab)).rev();
 
         let mut can_select = false;
         let mut last = None;
-        for TabInfo { position, .. } in tabs {
+        for layout in layouts {
+            let name = layout.name().to_string();
             if last.is_none() {
-                last.replace(position);
+                last.replace(name.clone());
             }
 
             if can_select {
-                self.selected = Some(*position);
+                self.selected = Some(name);
                 return;
-            } else if Some(*position) == self.selected {
+            } else if Some(name) == self.selected {
                 can_select = true;
             }
         }
 
-        if let Some(position) = last {
-            self.selected = Some(*position)
+        if let Some(name) = last {
+            self.selected = Some(name)
         }
     }
 }
@@ -102,9 +105,9 @@ register_plugin!(State);
 
 impl ZellijPlugin for State {
     fn load(&mut self, configuration: BTreeMap<String, String>) {
-        // we need the ReadApplicationState permission to receive the ModeUpdate and TabUpdate
+        // we need the ReadApplicationState permission to receive the ModeUpdate
         // events
-        // we need the ChangeApplicationState permission to Change Zellij state (Panes, Tabs and UI)
+        // we need the ChangeApplicationState permission to Change Zellij state (Panes, layouts and UI)
         request_permission(&[
             PermissionType::ReadApplicationState,
             PermissionType::ChangeApplicationState,
@@ -115,17 +118,21 @@ impl ZellijPlugin for State {
             None => true,
         };
 
-        subscribe(&[EventType::TabUpdate, EventType::Key]);
+        subscribe(&[EventType::SessionUpdate, EventType::Key]);
     }
 
     fn update(&mut self, event: Event) -> bool {
         let mut should_render = false;
         match event {
-            Event::TabUpdate(tab_info) => {
-                self.tabs = tab_info;
-                should_render = true;
+            Event::SessionUpdate(session_infos, _) => {
+                let first_session = session_infos[0].clone();
+                let curr_session = session_infos
+                    .into_iter()
+                    .find(|session| session.is_current_session)
+                    .unwrap_or(first_session);
+                // filter out the current session and get it's layouts
+                self.layouts = curr_session.available_layouts;
             }
-
             Event::Key(Key::Esc | Key::Ctrl('c')) => {
                 close_focus();
             }
@@ -141,14 +148,14 @@ impl ZellijPlugin for State {
                 should_render = true;
             }
             Event::Key(Key::Char('\n')) => {
-                let tab = self
-                    .tabs
+                let layout = self
+                    .layouts
                     .iter()
-                    .find(|tab| Some(tab.position) == self.selected);
+                    .find(|layout| layout.name() == self.selected.as_ref().unwrap());
 
-                if let Some(tab) = tab {
+                if let Some(tlayout) = layout {
                     close_focus();
-                    switch_tab_to(tab.position as u32 + 1);
+                    new_tabs_with_layout(tlayout.name());
                 }
             }
             Event::Key(Key::Backspace) => {
@@ -184,18 +191,11 @@ impl ZellijPlugin for State {
 
         println!(
             "{}",
-            self.viewable_tabs_iter()
-                .map(|tab| {
-                    let row = if tab.active {
-                        format!("{} - {}", tab.position + 1, tab.name)
-                            .red()
-                            .bold()
-                            .to_string()
-                    } else {
-                        format!("{} - {}", tab.position + 1, tab.name)
-                    };
+            self.viewable_layouts_iter()
+                .map(|layout| {
+                    let row = layout.name().to_string();
 
-                    if Some(tab.position) == self.selected {
+                    if Some(layout.name()) == self.selected.as_deref() {
                         row.on_cyan().to_string()
                     } else {
                         row

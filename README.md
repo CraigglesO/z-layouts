@@ -1,16 +1,16 @@
-# 🖤 room
+# z-layouts
 
 A [Zellij](https://zellij.dev) plugin for quickly searching
-and switching between tabs.
+and switching between layouts.
 
-![usage](https://github.com/rvcas/room/raw/main/img/usage.gif)
+![usage](https://github.com/CraigglesO/z-layouts/raw/main/img/usage.gif)
 
 ## Usage
 
-- `Tab` to cycle through tab list
-- `Up` and `Down` to cycle through tab list
-- `Enter` to switch to the selected tab
-- Start typing to filter the tab list
+- `Tab` to cycle through layout list
+- `Up` and `Down` to cycle through layout list
+- `Enter` to switch to the selected layout
+- Start typing to filter the layout list
 - `Esc` or `Ctrl + c` to exit
 
 ## Why?
@@ -21,18 +21,18 @@ that let’s me type to filter the tab list and then press enter to jump to the 
 
 ## Installation
 
-Download `room.wasm` from the [latest release](https://github.com/rvcas/room/releases/latest)
+Download `z-layouts.wasm` from the [latest release](https://github.com/CraigglesO/z-layouts/releases/latest)
 
 - `mkdir -p ~/.config/zellij/plugins/`
-- `mv room.wasm ~/.config/zellij/plugins/`
+- `mv z-layouts.wasm ~/.config/zellij/plugins/`
 
-> You don't need to keep `room.wasm` at this specified location. It's just where I like to
+> You don't need to keep `z-layouts.wasm` at this specified location. It's just where I like to
 > keep my zellij plugins.
 
 ### Quick Install
 
 ```
-curl -L "https://github.com/rvcas/room/releases/latest/download/room.wasm" -o ~/.config/zellij/plugins/room.wasm
+curl -L "https://github.com/CraigglesO/z-layouts/releases/latest/download/z-layouts.wasm" -o ~/.config/zellij/plugins/z-layouts.wasm
 ```
 
 ## Keybinding
@@ -42,8 +42,8 @@ somewhere inside the [keybinds](https://zellij.dev/documentation/keybindings.htm
 
 ```kdl
 shared_except "locked" {
-    bind "Ctrl y" {
-        LaunchOrFocusPlugin "file:~/.config/zellij/plugins/room.wasm" {
+    bind "Ctrl l" {
+        LaunchOrFocusPlugin "file:~/.config/zellij/plugins/z-layouts.wasm" {
             floating true
             ignore_case true
         }
@@ -58,11 +58,20 @@ the case of the filter string and the tab name.
 
 ## Contributing
 
-If you find any issues or want to suggest ideas please [open an issue](https://github.com/rvcas/room/issues/new).
+If you find any issues or want to suggest ideas please [open an issue](https://github.com/CraigglesO/z-layouts/issues/new).
 
 ### Development
 
-Make sure you have [rust](https://rustup.rs/) installed then run:
+- Install [rust](https://rustup.rs/)
+- Install **wasm32-wasi**: `rustup target add wasm32-wasi`
+
+#### Build
+
+```sh
+cargo build --target wasm32-wasi
+```
+
+#### Test
 
 ```sh
 zellij action new-tab --layout ./dev.kdl

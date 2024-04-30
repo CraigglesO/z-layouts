@@ -3,7 +3,9 @@
 A [Zellij](https://zellij.dev) plugin for quickly searching
 and switching between layouts.
 
-![usage](https://github.com/CraigglesO/z-layouts/raw/main/img/usage.gif)
+Shoutout to [Lucas Rosa](https://github.com/rvcas) for the inspiration.
+
+<!-- ![usage](https://github.com/CraigglesO/z-layouts/raw/main/img/usage.gif) -->
 
 ## Usage
 
@@ -13,11 +15,13 @@ and switching between layouts.
 - Start typing to filter the layout list
 - `Esc` or `Ctrl + c` to exit
 
+## NOTICE
+
+Requires Zellij `v0.41.0+`
+
 ## Why?
 
-I rename my tabs so once I have a lot of them I have to start
-counting and then press `Ctrl + t` then `<tab num>`. So I wanted something
-that let’s me type to filter the tab list and then press enter to jump to the selected tab.
+I have a lot of unique projects I work on, and to quickly switch between them and have the correct software already ready to go, I use layouts. Instead of memorizing all of them and typing out commands, I figured a plugin using `ctrl + l` would be a good way to do it.
 
 ## Installation
 
@@ -31,7 +35,7 @@ Download `z-layouts.wasm` from the [latest release](https://github.com/Craiggles
 
 ### Quick Install
 
-```
+```sh
 curl -L "https://github.com/CraigglesO/z-layouts/releases/latest/download/z-layouts.wasm" -o ~/.config/zellij/plugins/z-layouts.wasm
 ```
 
@@ -75,4 +79,15 @@ cargo build --target wasm32-wasi
 
 ```sh
 zellij action new-tab --layout ./dev.kdl
+```
+
+### Release Guide
+
+See [Release](./.github/workflows/release.yml)
+
+Example release command:
+
+```sh
+git tag -a v1.0.0 -m "Version 1.0.0"
+git push origin v1.0.0
 ```

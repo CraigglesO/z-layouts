@@ -12,4 +12,5 @@ publish = false
 ansi_term = "0.12.1"
 chrono = "0.4.26"
 owo-colors = "4.0.0"
-zellij-tile = "0.40.0"
+# zellij-tile = "0.40.0"
+zellij-tile = { git = "https://github.com/zellij-org/zellij", branch = "main", package = "zellij-tile" }

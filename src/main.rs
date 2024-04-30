@@ -151,9 +151,9 @@ impl ZellijPlugin for State {
                 let selected = self.selected.clone().unwrap();
                 let layout = self.layouts.iter().find(|layout| layout.name() == selected);
 
-                if let Some(tlayout) = layout {
+                if let Some(t_layout) = layout {
                     close_focus();
-                    new_tabs_with_layout(tlayout.name());
+                    new_tabs_with_layout_info(t_layout.clone());
                 }
             }
             Event::Key(Key::Backspace) => {

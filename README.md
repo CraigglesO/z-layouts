@@ -5,7 +5,7 @@ and switching between layouts.
 
 Shoutout to [Lucas Rosa](https://github.com/rvcas) for the inspiration.
 
-<!-- ![usage](https://github.com/CraigglesO/z-layouts/raw/main/img/usage.gif) -->
+![usage](https://github.com/CraigglesO/z-layouts/raw/main/img/usage.png)
 
 ## Usage
 

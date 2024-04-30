@@ -118,6 +118,9 @@ impl ZellijPlugin for State {
             None => true,
         };
 
+        // TODO: Get plugin position from config and update name to be visually nicer
+        // rename_plugin_pane(0, "zellij-layouts");
+
         subscribe(&[EventType::SessionUpdate, EventType::Key]);
     }
 
@@ -132,6 +135,7 @@ impl ZellijPlugin for State {
                     .unwrap_or(first_session);
                 // filter out the current session and get it's layouts
                 self.layouts = curr_session.available_layouts;
+                should_render = true;
             }
             Event::Key(Key::Esc | Key::Ctrl('c')) => {
                 close_focus();

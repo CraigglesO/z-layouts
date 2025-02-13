@@ -21,7 +21,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: wasm32-wasip1
+          target: wasm32-wasi
           override: true
           components: rustfmt, clippy
 

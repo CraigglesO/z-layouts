@@ -19,7 +19,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: wasm32-wasip1
+          target: wasm32-wasi
           override: true
           components: rustfmt, clippy
 
@@ -35,4 +35,4 @@ jobs:
           name: ${{ github.ref_name }}
           tag_name: ${{ github.ref }}
           files: |
-            target/wasm32-wasip1/release/z-layouts.wasm
+            target/wasm32-wasi/release/z-layouts.wasm
